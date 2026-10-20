@@ -1,0 +1,8 @@
+# Backend
+recipe-planner-backend/target/
+# Frontend
+recipe-planner-fronend/node_modules/
+recipe-planner-fronend/build/
+.DS_Store
+.idea/
+*.iml

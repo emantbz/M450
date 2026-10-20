@@ -1,0 +1,113 @@
+{
+  "info": {
+    "name": "Student API",
+    "description": "Automatisierte Tests für die REST-Schnittstelle /students des Spring Boot Backends.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081" }
+  ],
+  "item": [
+    {
+      "name": "1 - Alle Studenten abfragen",
+      "request": { "method": "GET", "url": "{{baseUrl}}/students" },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200', () => pm.response.to.have.status(200));",
+          "pm.test('Antwort ist JSON', () => pm.response.to.be.json);",
+          "pm.test('Antwortzeit unter 500 ms', () => pm.expect(pm.response.responseTime).to.be.below(500));",
+          "const students = pm.response.json();",
+          "pm.test('Liste enthält mindestens die 5 Start-Studenten', () => pm.expect(students.length).to.be.at.least(5));",
+          "pm.test('Jeder Student hat id, name und email', () => {",
+          "  students.forEach(s => pm.expect(s).to.have.all.keys('id', 'name', 'email'));",
+          "});",
+          "pm.test('Jonas ist vorhanden', () => {",
+          "  pm.expect(students.find(s => s.name === 'Jonas').email).to.eql('jonas@tbz.ch');",
+          "});"
+        ]}
+      }]
+    },
+    {
+      "name": "2 - Neuen Studenten erfassen",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/students",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"name\": \"{{newName}}\", \"email\": \"{{newEmail}}\" }" }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "exec": [
+            "// eindeutiger Name, damit der Test mehrmals laufen kann",
+            "const name = 'Newman' + Date.now();",
+            "pm.collectionVariables.set('newName', name);",
+            "pm.collectionVariables.set('newEmail', name.toLowerCase() + '@tbz.ch');"
+          ]}
+        },
+        {
+          "listen": "test",
+          "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}
+        }
+      ]
+    },
+    {
+      "name": "3 - Neuer Student ist in der Liste",
+      "request": { "method": "GET", "url": "{{baseUrl}}/students" },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const name = pm.collectionVariables.get('newName');",
+          "const student = pm.response.json().find(s => s.name === name);",
+          "pm.test('Student wurde gespeichert', () => pm.expect(student).to.not.be.undefined);",
+          "pm.test('E-Mail stimmt', () => pm.expect(student.email).to.eql(pm.collectionVariables.get('newEmail')));",
+          "pm.test('Student hat eine ID bekommen', () => pm.expect(student.id).to.be.above(0));"
+        ]}
+      }]
+    },
+    {
+      "name": "4 - Ungültiges JSON wird abgelehnt",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/students",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ das ist kein json" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));"
+        ]}
+      }]
+    },
+    {
+      "name": "5 - Unbekannter Endpunkt",
+      "request": { "method": "GET", "url": "{{baseUrl}}/gibtesnicht" },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 404 Not Found', () => pm.response.to.have.status(404));"
+        ]}
+      }]
+    },
+    {
+      "name": "6 - CORS für das Angular Frontend",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/students",
+        "header": [{ "key": "Origin", "value": "http://localhost:4200" }]
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Frontend auf Port 4200 darf zugreifen', () => {",
+          "  pm.response.to.have.header('Access-Control-Allow-Origin', 'http://localhost:4200');",
+          "});"
+        ]}
+      }]
+    }
+  ]
+}

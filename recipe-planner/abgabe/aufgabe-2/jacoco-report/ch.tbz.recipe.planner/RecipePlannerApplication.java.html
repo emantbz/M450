@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipePlannerApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">recipe-planner-backend</a> &gt; <a href="index.source.html" class="el_package">ch.tbz.recipe.planner</a> &gt; <span class="el_source">RecipePlannerApplication.java</span></div><h1>RecipePlannerApplication.java</h1><pre class="source lang-java linenums">package ch.tbz.recipe.planner;
+
+import ch.tbz.recipe.planner.mapper.RecipeEntityMapper;
+import ch.tbz.recipe.planner.repository.RecipeRepository;
+import ch.tbz.recipe.planner.domain.Ingredient;
+import ch.tbz.recipe.planner.domain.Recipe;
+import ch.tbz.recipe.planner.domain.Unit;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+@SpringBootApplication
+<span class="fc" id="L21">@Slf4j</span>
+<span class="fc" id="L22">public class RecipePlannerApplication {</span>
+
+	private final static String DESCRIPTION = &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&quot;;
+<span class="fc" id="L25">	private final static List&lt;String&gt; IMAGES =</span>
+<span class="fc" id="L26">			List.of(&quot;https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg&quot;,</span>
+					&quot;https://img.taste.com.au/5qlr1PkR/taste/2016/11/spaghetti-bolognese-106560-1.jpeg&quot;,
+					&quot;https://www.kitchensanctuary.com/wp-content/uploads/2020/04/Chicken-Fried-Rice-square-FS-.jpg&quot;,
+					&quot;https://www.deliciousmagazine.co.uk/wp-content/uploads/2020/01/lasagne.jpg&quot;,
+					&quot;https://recipeimages.migros.ch/crop/v-w-1200-h-630-a-center_center/ac38873942ada8c8154f0da0a748adf486a304d8/pommes-frites-0-16-9.jpg&quot;
+					);
+	public static void main(String[] args) {
+<span class="nc" id="L33">		SpringApplication.run(RecipePlannerApplication.class, args);</span>
+<span class="nc" id="L34">	}</span>
+
+	@Autowired
+	RecipeEntityMapper mapper;
+
+	@Bean
+	CommandLineRunner init(RecipeRepository recipeRepository) {
+<span class="fc" id="L41">		Random rand = new Random();</span>
+
+<span class="fc" id="L43">		return args -&gt; {</span>
+<span class="fc" id="L44">			Stream.of(</span>
+					&quot;Lasagne al Forno&quot;, &quot;Spaghetti Bolognese&quot;, &quot;Fried Rice&quot;, &quot;Spaghetti Bolognese&quot;, &quot;Pommes Frites&quot;,
+					&quot;Lasagne al Forno&quot;, &quot;Spaghetti Bolognese&quot;, &quot;Fried Rice&quot;, &quot;Spaghetti Bolognese&quot;, &quot;Pommes Frites&quot;,
+<span class="fc" id="L47">					&quot;Lasagne al Forno&quot;, &quot;Spaghetti Bolognese&quot;, &quot;Fried Rice&quot;, &quot;Spaghetti Bolognese&quot;, &quot;Pommes Frites&quot;).forEach(name -&gt; {</span>
+<span class="fc" id="L48">				int randomIndex = rand.nextInt(IMAGES.size());</span>
+<span class="fc" id="L49">				Recipe recipe = new Recipe(UUID.randomUUID(), name, DESCRIPTION, IMAGES.get(randomIndex), List.of(new Ingredient(UUID.randomUUID(), &quot;Tomato&quot;, &quot;The big ones&quot;, Unit.PIECE, 5)));</span>
+<span class="fc" id="L50">				var entity = mapper.domainToEntity(recipe);</span>
+<span class="fc" id="L51">				recipeRepository.save(entity);</span>
+<span class="fc" id="L52">			});</span>
+<span class="pc" id="L53">			recipeRepository.findAll().forEach(s -&gt; log.info(s.toString()));</span>
+<span class="fc" id="L54">		};</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+recipe-planner-backend,ch.tbz.recipe.planner.mapper,RecipeEntityMapperImpl,0,185,0,16,0,51,0,15,0,7
+recipe-planner-backend,ch.tbz.recipe.planner.mapper,IngredientEntityMapperImpl,0,121,0,12,0,33,0,11,0,5
+recipe-planner-backend,ch.tbz.recipe.planner.mapper,CommonMapperConfig,3,0,0,0,1,0,1,0,1,0
+recipe-planner-backend,ch.tbz.recipe.planner,RecipePlannerApplication,10,131,0,0,2,15,2,5,2,5
+recipe-planner-backend,ch.tbz.recipe.planner.domain,Unit,0,33,0,0,0,6,0,1,0,1
+recipe-planner-backend,ch.tbz.recipe.planner.service,RecipeService,0,49,0,0,0,9,0,4,0,4
+recipe-planner-backend,ch.tbz.recipe.planner.controller,RecipeController,0,39,0,0,0,8,0,5,0,5

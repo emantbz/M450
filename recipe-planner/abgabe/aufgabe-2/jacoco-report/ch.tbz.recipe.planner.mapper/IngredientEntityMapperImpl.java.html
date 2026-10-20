@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IngredientEntityMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">recipe-planner-backend</a> &gt; <a href="index.source.html" class="el_package">ch.tbz.recipe.planner.mapper</a> &gt; <span class="el_source">IngredientEntityMapperImpl.java</span></div><h1>IngredientEntityMapperImpl.java</h1><pre class="source lang-java linenums">package ch.tbz.recipe.planner.mapper;
+
+import ch.tbz.recipe.planner.domain.Ingredient;
+import ch.tbz.recipe.planner.entities.IngredientEntity;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-10-20T14:27:15+0200&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.11 (Eclipse Adoptium)&quot;
+)
+@Component
+<span class="fc" id="L16">public class IngredientEntityMapperImpl implements IngredientEntityMapper {</span>
+
+    @Override
+    public Ingredient entityToDomain(IngredientEntity ingredientEntity) {
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        if ( ingredientEntity == null ) {</span>
+<span class="fc" id="L21">            return null;</span>
+        }
+
+<span class="fc" id="L24">        Ingredient ingredient = new Ingredient();</span>
+
+<span class="fc" id="L26">        ingredient.setId( ingredientEntity.getId() );</span>
+<span class="fc" id="L27">        ingredient.setName( ingredientEntity.getName() );</span>
+<span class="fc" id="L28">        ingredient.setComment( ingredientEntity.getComment() );</span>
+<span class="fc" id="L29">        ingredient.setUnit( ingredientEntity.getUnit() );</span>
+<span class="fc" id="L30">        ingredient.setAmount( ingredientEntity.getAmount() );</span>
+
+<span class="fc" id="L32">        return ingredient;</span>
+    }
+
+    @Override
+    public IngredientEntity domainToEntity(Ingredient ingredient) {
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if ( ingredient == null ) {</span>
+<span class="fc" id="L38">            return null;</span>
+        }
+
+<span class="fc" id="L41">        IngredientEntity ingredientEntity = new IngredientEntity();</span>
+
+<span class="fc" id="L43">        ingredientEntity.setId( ingredient.getId() );</span>
+<span class="fc" id="L44">        ingredientEntity.setName( ingredient.getName() );</span>
+<span class="fc" id="L45">        ingredientEntity.setComment( ingredient.getComment() );</span>
+<span class="fc" id="L46">        ingredientEntity.setUnit( ingredient.getUnit() );</span>
+<span class="fc" id="L47">        ingredientEntity.setAmount( ingredient.getAmount() );</span>
+
+<span class="fc" id="L49">        return ingredientEntity;</span>
+    }
+
+    @Override
+    public List&lt;Ingredient&gt; entitiesToDomains(List&lt;IngredientEntity&gt; ingredientEntities) {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if ( ingredientEntities == null ) {</span>
+<span class="fc" id="L55">            return null;</span>
+        }
+
+<span class="fc" id="L58">        List&lt;Ingredient&gt; list = new ArrayList&lt;Ingredient&gt;( ingredientEntities.size() );</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for ( IngredientEntity ingredientEntity : ingredientEntities ) {</span>
+<span class="fc" id="L60">            list.add( entityToDomain( ingredientEntity ) );</span>
+<span class="fc" id="L61">        }</span>
+
+<span class="fc" id="L63">        return list;</span>
+    }
+
+    @Override
+    public List&lt;IngredientEntity&gt; domainsToEntities(List&lt;Ingredient&gt; ingredients) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if ( ingredients == null ) {</span>
+<span class="fc" id="L69">            return null;</span>
+        }
+
+<span class="fc" id="L72">        List&lt;IngredientEntity&gt; list = new ArrayList&lt;IngredientEntity&gt;( ingredients.size() );</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for ( Ingredient ingredient : ingredients ) {</span>
+<span class="fc" id="L74">            list.add( domainToEntity( ingredient ) );</span>
+<span class="fc" id="L75">        }</span>
+
+<span class="fc" id="L77">        return list;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

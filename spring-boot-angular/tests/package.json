@@ -1,0 +1,15 @@
+{
+  "name": "student-app-tests",
+  "private": true,
+  "scripts": {
+    "test:api": "newman run api/students.postman_collection.json --env-var baseUrl=http://localhost:8081",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:load": "node load/load-test.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "autocannon": "^8.0.0",
+    "newman": "^6.2.2"
+  }
+}

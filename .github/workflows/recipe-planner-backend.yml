@@ -1,0 +1,80 @@
+# Build-Pipeline für das Recipe Planner Backend
+# Läuft bei jedem Push und Pull Request: kompilieren -> Unit-Tests -> Reports
+name: Recipe Planner Backend CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch: # manuell starten über den "Actions"-Tab
+
+jobs:
+  build-and-test:
+    name: Build & Unit-Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: recipe-planner/recipe-planner-backend
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Java 21 einrichten
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build, Unit-Tests und Reports (mvn verify)
+        run: |
+          chmod +x mvnw
+          ./mvnw -B verify
+
+      - name: Zusammenfassung im Pipeline-Lauf anzeigen
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import csv, glob, os
+          import xml.etree.ElementTree as ET
+
+          tests = failures = errors = skipped = 0
+          rows = []
+          for f in sorted(glob.glob('target/surefire-reports/TEST-*.xml')):
+              s = ET.parse(f).getroot()
+              t, fa, e, sk = (int(s.get(k)) for k in ('tests', 'failures', 'errors', 'skipped'))
+              tests += t; failures += fa; errors += e; skipped += sk
+              status = '✅' if fa + e == 0 else '❌'
+              rows.append(f"| {status} | {s.get('name').split('.')[-1]} | {t} | {fa + e} |")
+
+          print('## 🧪 Unit-Tests')
+          print(f'**{tests} Tests**, {failures + errors} fehlgeschlagen, {skipped} übersprungen\n')
+          print('| | Testklasse | Tests | Fehler |')
+          print('|---|---|---|---|')
+          print('\n'.join(rows))
+
+          path = 'target/site/jacoco/jacoco.csv'
+          if os.path.exists(path):
+              cov = mis = bcov = bmis = 0
+              for r in csv.DictReader(open(path)):
+                  cov += int(r['INSTRUCTION_COVERED']); mis += int(r['INSTRUCTION_MISSED'])
+                  bcov += int(r['BRANCH_COVERED']); bmis += int(r['BRANCH_MISSED'])
+              print('\n## 📊 Code Coverage (JaCoCo)')
+              print(f'- Instructions: **{cov / (cov + mis) * 100:.1f} %**')
+              if bcov + bmis:
+                  print(f'- Branches: **{bcov / (bcov + bmis) * 100:.1f} %**')
+
+          print('\n📦 Die vollständigen HTML-Reports gibt es unten unter **Artifacts → test-reports**.')
+          PY
+
+      - name: Reports als Artifact hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            recipe-planner/recipe-planner-backend/target/reports/
+            recipe-planner/recipe-planner-backend/target/site/jacoco/
+            recipe-planner/recipe-planner-backend/target/surefire-reports/
+          retention-days: 30

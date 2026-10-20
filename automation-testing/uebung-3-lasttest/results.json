@@ -1,0 +1,38 @@
+[
+  {
+    "Szenario": "1) GET /students – Ausgangslage",
+    "Requests total": 468975,
+    "Requests/s (avg)": 23449,
+    "Latenz avg (ms)": 81,
+    "Latenz p99 (ms)": 161,
+    "Latenz max (ms)": 264,
+    "Fehler": 4293,
+    "Timeouts": 0,
+    "Nicht-2xx": 0,
+    "Studenten in DB": 5
+  },
+  {
+    "Szenario": "2) POST /students – viele neue Studenten",
+    "Requests total": 503310,
+    "Requests/s (avg)": 25166,
+    "Latenz avg (ms)": 87,
+    "Latenz p99 (ms)": 208,
+    "Latenz max (ms)": 260,
+    "Fehler": 4936,
+    "Timeouts": 0,
+    "Nicht-2xx": 0,
+    "Studenten in DB": 503362
+  },
+  {
+    "Szenario": "3) GET /students – nach dem POST-Test (viel mehr Daten)",
+    "Requests total": 0,
+    "Requests/s (avg)": 0,
+    "Latenz avg (ms)": 0,
+    "Latenz p99 (ms)": 0,
+    "Latenz max (ms)": 0,
+    "Fehler": 101,
+    "Timeouts": 101,
+    "Nicht-2xx": 0,
+    "Studenten in DB": 503362
+  }
+]
