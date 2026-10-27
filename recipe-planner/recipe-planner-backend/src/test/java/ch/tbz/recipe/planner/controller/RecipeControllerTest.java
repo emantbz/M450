@@ -3,6 +3,7 @@ package ch.tbz.recipe.planner.controller;
 import ch.tbz.recipe.planner.domain.Ingredient;
 import ch.tbz.recipe.planner.domain.Recipe;
 import ch.tbz.recipe.planner.domain.Unit;
+import ch.tbz.recipe.planner.exception.RecipeNotFoundException;
 import ch.tbz.recipe.planner.mapper.RecipeEntityMapper;
 import ch.tbz.recipe.planner.repository.RecipeRepository;
 import ch.tbz.recipe.planner.service.RecipeService;
@@ -22,9 +23,11 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -169,6 +172,88 @@ class RecipeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PUT /api/recipes/recipe/{id} aktualisiert das Rezept und liefert es zurück")
+    void updateRecipe() throws Exception {
+        Recipe changed = lasagne();
+        changed.setName("Lasagne vegetarisch");
+        when(service.updateRecipe(eq(RECIPE_ID), any(Recipe.class))).thenReturn(changed);
+
+        mockMvc.perform(put("/api/recipes/recipe/{id}", RECIPE_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changed)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(RECIPE_ID.toString()))
+                .andExpect(jsonPath("$.name").value("Lasagne vegetarisch"));
+
+        ArgumentCaptor<Recipe> captor = ArgumentCaptor.forClass(Recipe.class);
+        verify(service).updateRecipe(eq(RECIPE_ID), captor.capture());
+        assertThat(captor.getValue().getName()).isEqualTo("Lasagne vegetarisch");
+    }
+
+    @Test
+    @DisplayName("PUT ohne ID im Body verwendet die ID aus der URL")
+    void updateRecipeWithoutIdInBody() throws Exception {
+        Recipe changed = lasagne();
+        changed.setId(null);
+        when(service.updateRecipe(eq(RECIPE_ID), any(Recipe.class))).thenReturn(lasagne());
+
+        mockMvc.perform(put("/api/recipes/recipe/{id}", RECIPE_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changed)))
+                .andExpect(status().isOk());
+
+        verify(service).updateRecipe(eq(RECIPE_ID), any(Recipe.class));
+    }
+
+    @Test
+    @DisplayName("PUT mit unbekannter ID liefert 404")
+    void updateRecipeNotFound() throws Exception {
+        UUID unknown = UUID.randomUUID();
+        when(service.updateRecipe(eq(unknown), any(Recipe.class))).thenThrow(new RecipeNotFoundException(unknown));
+
+        mockMvc.perform(put("/api/recipes/recipe/{id}", unknown)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"name\": \"Test\" }"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PUT mit anderer ID im Body als in der URL liefert 400")
+    void updateRecipeIdMismatch() throws Exception {
+        Recipe other = lasagne();
+        other.setId(UUID.randomUUID());
+
+        mockMvc.perform(put("/api/recipes/recipe/{id}", RECIPE_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(other)))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @DisplayName("PUT mit ungültigem JSON liefert 400")
+    void updateRecipeInvalidJson() throws Exception {
+        mockMvc.perform(put("/api/recipes/recipe/{id}", RECIPE_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ kein json"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @DisplayName("CORS: Frontend darf PUT verwenden (Preflight)")
+    void corsAllowsPutFromFrontend() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .options("/api/recipes/recipe/{id}", RECIPE_ID)
+                        .header("Origin", "http://localhost:3000")
+                        .header("Access-Control-Request-Method", "PUT"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:3000"));
     }
 
     @Test

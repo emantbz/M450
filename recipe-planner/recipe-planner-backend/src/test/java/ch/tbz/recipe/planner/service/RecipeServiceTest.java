@@ -2,6 +2,7 @@ package ch.tbz.recipe.planner.service;
 
 import ch.tbz.recipe.planner.domain.Recipe;
 import ch.tbz.recipe.planner.entities.RecipeEntity;
+import ch.tbz.recipe.planner.exception.RecipeNotFoundException;
 import ch.tbz.recipe.planner.mapper.RecipeEntityMapper;
 import ch.tbz.recipe.planner.repository.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -74,5 +76,30 @@ class RecipeServiceTest {
         assertThat(saved.getId()).isEqualTo(ID);
         assertThat(saved.getName()).isEqualTo("Neu");
         verify(repository).save(any(RecipeEntity.class));
+    }
+
+    @Test
+    @DisplayName("updateRecipe speichert das Rezept mit der ID aus der URL")
+    void updateRecipe() {
+        when(repository.findById(ID)).thenReturn(Optional.of(new RecipeEntity(ID, "Alt", null, null, List.of())));
+        when(repository.save(any(RecipeEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Recipe updated = service.updateRecipe(ID, new Recipe(null, "Neu", "Beschreibung", "url", List.of()));
+
+        assertThat(updated.getId()).isEqualTo(ID);
+        assertThat(updated.getName()).isEqualTo("Neu");
+        verify(repository).save(argThat(entity -> ID.equals(entity.getId())));
+    }
+
+    @Test
+    @DisplayName("updateRecipe wirft RecipeNotFoundException bei unbekannter ID")
+    void updateRecipeNotFound() {
+        UUID unknown = UUID.randomUUID();
+        when(repository.findById(unknown)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.updateRecipe(unknown, new Recipe()))
+                .isInstanceOf(RecipeNotFoundException.class)
+                .hasMessageContaining(unknown.toString());
+        verify(repository, never()).save(any());
     }
 }
