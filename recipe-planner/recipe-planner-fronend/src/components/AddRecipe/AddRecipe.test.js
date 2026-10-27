@@ -1,6 +1,7 @@
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
-import AddRecipe, {validate} from './AddRecipe';
+import AddRecipe from './AddRecipe';
+import {validate} from '../RecipeForm/RecipeForm';
 import {addRecipe} from '../../apis/recipeApi';
 
 jest.mock('../../apis/recipeApi');
